@@ -1,0 +1,57 @@
+node_modules/
+dist/
+.env
+.env.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local config and credentials
+/.planka-cli/
+/.planka-cli/**
+tasks.json
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor folders
+.vscode/
+.idea/
+
+# Logs
+logs
+*.log
+
+# npm
+package-lock.json
+#Vs Code extensions
+.vscode
+
+# Planka Task Integration
+
+node_modules/
+.env
+.env.local
+
+# Backups
+backups/
+*.backup
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE files  
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Temporary files
+tmp/
+temp/
