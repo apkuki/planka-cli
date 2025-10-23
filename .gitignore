@@ -24,15 +24,10 @@ logs
 *.log
 
 # npm
-package-lock.json
-#Vs Code extensions
-.vscode
 
 # Planka Task Integration
 
-node_modules/
-.env
-.env.local
+
 
 # Backups
 backups/
