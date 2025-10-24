@@ -9,6 +9,7 @@ import path from 'path';
 import os from 'os';
 import { configurePlankaCLI } from './config.js';
 import createTaskCLI from './create.js';
+import aiCreateTask from './ai-create.js';
 import importFromPlanka from './import.js';
 import listTasksHandler from './list.js';
 import { loadConfig } from './config-loader.js';
@@ -62,6 +63,38 @@ program
   .option('--dry-run', 'Show what would be created without modifying remote')
   .action(async (options) => {
     await createTaskCLI(options);
+  });
+
+program
+  .command('ai-create')
+  .description('Non-interactive create for AI agents. Provide JSON via --input or stdin')
+  .option('-i, --input <file>', 'Path to JSON input file')
+  .option('--dry-run', 'Show what would be created without modifying remote')
+  .action(async (options) => {
+    try {
+      let data = null;
+      if (options.input) {
+        const fs = await import('fs');
+        data = JSON.parse(fs.readFileSync(options.input, 'utf8'));
+      } else {
+        // read stdin
+        const getStdin = async () => {
+          const chunks = [];
+          for await (const chunk of process.stdin) chunks.push(chunk);
+          return Buffer.concat(chunks).toString('utf8');
+        };
+        const raw = (await getStdin()).trim();
+        if (raw) data = JSON.parse(raw);
+      }
+      if (!data) {
+        console.error('No input provided. Use --input <file> or pipe JSON to stdin.');
+        process.exit(1);
+      }
+      await aiCreateTask(data, { dryRun: !!options.dryRun });
+    } catch (err) {
+      console.error('AI create failed:', err.message || err);
+      process.exit(1);
+    }
   });
 
 // config command is provided by ./config.js
