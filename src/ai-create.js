@@ -2,6 +2,7 @@ import { loadConfig } from './config-loader.js';
 import PlankaAPI from './planka-api.js';
 import JsonTaskManager from './json-task-manager.js';
 import logger from './logger.js';
+import { parseDateInput } from './prompt-utils.js';
 
 /**
  * Non-interactive task creation for LLM agents / scripts.
@@ -20,13 +21,31 @@ export default async function aiCreateTask(input = {}, opts = {}) {
 
   await planka.authenticate();
 
+  // Helper: fuzzy match by name (exact -> case-insensitive -> substring -> startsWith)
+  const fuzzyFind = (items, nameKey, needle) => {
+    if (!items || !needle) return undefined;
+    const norm = String(needle).toLowerCase().trim();
+    // exact id-like
+    let found = items.find(i => (i.id && String(i.id) === needle) || (i[nameKey] && String(i[nameKey]) === needle));
+    if (found) return found;
+    // case-insensitive exact
+    found = items.find(i => i[nameKey] && String(i[nameKey]).toLowerCase() === norm);
+    if (found) return found;
+    // substring
+    found = items.find(i => i[nameKey] && String(i[nameKey]).toLowerCase().includes(norm));
+    if (found) return found;
+    // startsWith
+    found = items.find(i => i[nameKey] && String(i[nameKey]).toLowerCase().startsWith(norm));
+    return found;
+  };
+
   // Resolve lists
   let lists = [];
   try { lists = await planka.getLists(); } catch (e) { logger.warn('Could not fetch lists:', e.message); }
 
   let listId = input.listId;
   if (!listId && input.listName && lists && lists.length) {
-    const found = lists.find(l => l.name && l.name.toLowerCase() === input.listName.toLowerCase());
+    const found = fuzzyFind(lists, 'name', input.listName);
     if (found) listId = found.id || found;
     else {
       // create list
@@ -49,8 +68,8 @@ export default async function aiCreateTask(input = {}, opts = {}) {
         labelIds.push(label);
         continue;
       }
-      // find by name
-      const found = existingLabels.find(l => l.name && l.name.toLowerCase() === String(label).toLowerCase());
+      // fuzzy find by name
+      const found = fuzzyFind(existingLabels, 'name', label);
       if (found) labelIds.push(found.id || found);
       else {
         const created = await planka.createLabel(config.boardId, { name: String(label), color: 'morning-sky' });
@@ -66,7 +85,12 @@ export default async function aiCreateTask(input = {}, opts = {}) {
     labelIds
   };
   if (input.dueDate) {
-    const d = new Date(input.dueDate);
+    // accept ISO or natural language
+    let d = new Date(input.dueDate);
+    if (isNaN(d.getTime())) {
+      const parsed = parseDateInput(String(input.dueDate));
+      d = parsed ? new Date(parsed) : d;
+    }
     if (!isNaN(d.getTime())) cardData.dueDate = d.toISOString();
   }
 

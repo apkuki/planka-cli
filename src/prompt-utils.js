@@ -374,6 +374,9 @@ function parseDateInput(text, locale = 'en-US') {
   return null;
 }
 
+// Export parser for use by non-interactive flows
+export { parseDateInput };
+
 /**
  * Ask for Planka authorization details in sequence (baseURL, username, password or token)
  * Shows existing values as defaults when provided via the `existing` object.

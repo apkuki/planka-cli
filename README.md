@@ -177,6 +177,42 @@ planka list --pending
 planka test --verbose
 ```
 
+## AI / Non-interactive usage
+
+The CLI provides a non-interactive entrypoint `planka ai-create` intended for LLM agents or scripts. It accepts a JSON payload (via `--input <file>` or piped to stdin) describing the card to create. The helper will resolve list names and labels (creating them if missing) and persist a local synced task.
+
+JSON schema (example fields):
+
+- title (string, required)
+- description (string, optional)
+- listName (string) or listId (string) — preferred target list on the board
+- labels (array of strings) — label names or ids to add to the card
+- subtasks (array of strings) — task items to create on the card
+- dueDate (string) — ISO date or short natural language (e.g., "tomorrow", "in 3 days")
+
+Example file `task.json`:
+
+```json
+{
+   "title": "Write deployment notes",
+   "description": "Summarize deployment steps for dapp v2",
+   "listName": "To Do",
+   "labels": ["Docs", "High Priority"],
+   "subtasks": ["Draft notes", "Review with team"],
+   "dueDate": "tomorrow"
+}
+```
+
+Run (dry-run preview):
+
+```powershell
+planka ai-create --input task.json --dry-run
+# or pipe JSON via stdin:
+cat task.json | planka ai-create --dry-run
+```
+
+The non-interactive flow uses the same date parsing heuristics as interactive mode and will attempt to match list/label names fuzzily (exact → case-insensitive → substring → startsWith) before creating new ones.
+
 ### Typical Workflow
 
 ```bash
