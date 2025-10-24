@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/apkuki/planka-cli/compare/v1.2.0...v1.3.0) (2025-10-24)
+
+
+### Features
+
+* **ai:** fuzzy matching & NL date parsing for ai-create; docs ([1705ebe](https://github.com/apkuki/planka-cli/commit/1705ebec16f0cb9fa17b23c218e4211405d1d03f))
+
 # [1.2.0](https://github.com/apkuki/planka-cli/compare/v1.1.1...v1.2.0) (2025-10-24)
 
 
