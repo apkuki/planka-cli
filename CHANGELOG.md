@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/apkuki/planka-cli/compare/v1.0.0...v1.1.0) (2025-10-24)
+
+
+### Features
+
+* **config:** partial flags, clearer board prompts, and add unit test for project-config matching ([066574a](https://github.com/apkuki/planka-cli/commit/066574a33f060b0ba3b4266bf40a8d78d0bd509b))
+
 # 1.0.0 (2025-10-24)
 
 
