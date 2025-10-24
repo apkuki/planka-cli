@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/apkuki/planka-cli/compare/v1.1.0...v1.1.1) (2025-10-24)
+
+
+### Bug Fixes
+
+* remove category and priority support; use labels only and update README ([5973e2d](https://github.com/apkuki/planka-cli/commit/5973e2dee9b5a05ff35e6d36e4af5f9e68712c74))
+
 # [1.1.0](https://github.com/apkuki/planka-cli/compare/v1.0.0...v1.1.0) (2025-10-24)
 
 
