@@ -32,10 +32,10 @@ Install locally and (optionally) make the CLI available as a global command:
 git clone https://github.com/apkuki/planka-cli.git
 cd planka-cli
 
-# Install dependencies  
+# Install dependencies
 npm install
 
-# Make CLI available globally (recommended)
+# Make the CLI available globally (recommended)
 npm link
 ```
 
@@ -70,7 +70,7 @@ Schema (example):
 **Configuration Notes:**
 - `authorization` contains credentials used for authentication. Password entry is masked when you run `planka config`.
 - `default.PLANKA_BOARD_ID` is used when no per-project override exists.
-- `projects` can contain per-project overrides keyed by absolute project path — useful if you maintain multiple boards for different repositories.
+- `projects` can contain per-project configuration overrides keyed by absolute project path — useful if you maintain multiple boards for different repositories.
 
 ## Authentication
 
@@ -97,7 +97,7 @@ This documents what happens when you run `planka create`:
 1. Prompt: Title (required)
    - You must enter a non-empty title. This becomes the card name on Planka and the local task `title`.
 2. Prompt: Description (optional)
-   - Free text, multi-line not supported in simple prompt; leave empty to skip.
+   - Free text — multi-line input is not supported in the simple prompt; leave empty to skip.
 3. Prompt: Subtasks (optional)
    - Enter comma-separated subtasks or press Enter to skip. Each becomes a task list item on the card.
 4. Prompt: Due date (optional, locale-aware)

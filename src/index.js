@@ -78,8 +78,12 @@ program
 program
   .command('config')
   .description('Configure Planka CLI tool')
-  .action(async () => {
-    await configurePlankaCLI();
+  .option('-p, --project', 'Only configure a project-specific board (skip authorization and global default)')
+  .option('-a, --auth', 'Only run authorization setup (URL, username, password)')
+  .option('-d, --default', 'Only configure the global default board ID')
+  .option('--dry-run', 'Show what would be written without changing files')
+  .action(async (options) => {
+    await configurePlankaCLI(options);
   });
 
 // loadConfig is provided by ./config-loader.js
