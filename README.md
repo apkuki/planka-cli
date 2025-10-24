@@ -1,8 +1,8 @@
 # Planka CLI Tool — Usage & Reference
 
-This README documents what the CLI can do, how to configure authentication (global and per-project), the interactive "create" flow, available commands and flags, and troubleshooting tips.
+This README documents what the Planka CLI can do, how to configure authentication (global and per-project), the interactive "create" flow, available commands and flags, and troubleshooting tips.
 
-Target audience: users who want a simple CLI to create tasks locally and sync them to a Planka board, or to import cards from Planka into a local JSON task store.
+Target audience: users who want a simple CLI to create planka tasks locally and sync them to a Planka board. Planka is considered the source of truth.
 
 --
 
@@ -23,6 +23,11 @@ Table of contents
 - Import cards from Planka into local JSON.
 - Dry-run mode for `create` and `import` to preview payloads without writing to Planka.
 - Locale-aware date parsing (accepts local numeric formats like `30.10.2025` for de locales).
+
+## Open possible Iprovements
+All Project Management related work like ticking off sub-task, moving cards adding media to cards etc. is done in Planka frontend. For sync reasons (and later improvements) PLanka CLI writes new tasks to a Local .json store and syncs them to Planka. A bidirectional sync can therefore be added in later versions
+- adding non-interactive flow, so that task can be generated skripted or by using an LLM calling the function
+- adding biderectional support to move task in CLI or tick off subtask while working (coding) in your environment)
 
 ## Configuration
 
