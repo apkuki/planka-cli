@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/apkuki/planka-cli/compare/v1.1.1...v1.2.0) (2025-10-24)
+
+
+### Features
+
+* **ai:** add non-interactive ai-create helper and CLI command ([99f90dc](https://github.com/apkuki/planka-cli/commit/99f90dc40fff08b7c4ef0c05e92453067ba5dd08))
+
 ## [1.1.1](https://github.com/apkuki/planka-cli/compare/v1.1.0...v1.1.1) (2025-10-24)
 
 
