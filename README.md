@@ -1,28 +1,45 @@
 # Planka CLI Tool — Usage & Reference
 
-This README documents what the CLI can do, how to configure authentication (global and per-project), the interactive "create" flow, available commands and flags, and troubleshooting tips.
-
-Target audience: users who want a simple CLI to create tasks locally and sync them to a Planka board, or to import cards from Planka into a local JSON task store.
-
---
-
-Table of contents
-- Features
-- Configuration (global + per-project)
-- Authentication
-- Interactive create flow (step-by-step)
-- Commands & flags
-- Examples
-- Troubleshooting
+A command-line interface for creating and syncing tasks between a local JSON file and your Planka kanban board.
 
 ## Features
 
-- Interactive task creation with optional description, subtasks, due date, list selection and label selection.
-- Automatic categorization (based on title/description keywords). Priority defaults to `normal` unless provided.
-- Local JSON task store at `tasks.json` with sync metadata (plankaCardId, synced flag).
-- Import cards from Planka into local JSON.
-- Dry-run mode for `create` and `import` to preview payloads without writing to Planka.
-- Locale-aware date parsing (accepts local numeric formats like `30.10.2025` for de locales).
+- 🎯 **Interactive task creation** with optional description, subtasks, due date, list and label selection
+- 🏷️ **Smart categorization** based on title/description keywords (priority defaults to `normal`)
+- 💾 **Local JSON task store** at `tasks.json` with sync metadata (plankaCardId, synced flag)
+- 📥 **Import cards** from Planka into local JSON
+- 🔍 **Dry-run mode** for `create` and `import` to preview without making changes
+- 🌍 **Locale-aware date parsing** (accepts formats like `30.10.2025` for German locales)
+- 🔐 **Secure authentication** with masked password input and token management
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Configuration](#configuration)
+- [Authentication](#authentication)  
+- [Interactive Create Flow](#interactive-create-flow-step-by-step)
+- [Commands & Flags](#commands--flags)
+- [Examples](#examples)
+- [Contributing](#contributing)
+- [Troubleshooting](#troubleshooting)
+
+## Installation
+
+Install locally and (optionally) make the CLI available as a global command:
+
+```bash
+# Clone the repository
+git clone https://github.com/apkuki/planka-cli.git
+cd planka-cli
+
+# Install dependencies  
+npm install
+
+# Make CLI available globally (recommended)
+npm link
+```
+
+After `npm link`, the CLI will be available as the `planka` command. If you haven't linked globally, use `node src/index.js` instead.
 
 ## Configuration
 
@@ -50,8 +67,8 @@ Schema (example):
 }
 ```
 
-Notes:
-- `authorization` contains credentials used for authentication. Password entry is masked when you run `node src/index.js config`.
+**Configuration Notes:**
+- `authorization` contains credentials used for authentication. Password entry is masked when you run `planka config`.
 - `default.PLANKA_BOARD_ID` is used when no per-project override exists.
 - `projects` can contain per-project overrides keyed by absolute project path — useful if you maintain multiple boards for different repositories.
 
@@ -63,33 +80,19 @@ If you provide username/password, the CLI will POST to `/access-tokens?withHttpO
 
 Security note: the config file stores credentials locally — protect your home directory. Consider using per-project config for less privileged environments.
 
-## Installation
+### Quick Start
 
-Install locally and (optionally) make the CLI available as a global command.
+After installation, configure your Planka connection:
 
-From the project root:
-
-```powershell
-npm install
-# Optionally link the package globally so you can call `planka` from anywhere
-npm link
+```bash
+planka config     # Interactive setup: URL, username, password, board
+planka test       # Verify connection
+planka create     # Create your first task
 ```
 
-After `npm link` the CLI will be available as the `planka` command (if your package.json `bin` is set up). Example usages below show the `planka` shortcut; if you haven't linked, use `node src/index.js` instead.
+## Interactive Create Flow (step-by-step)
 
-Examples once linked:
-
-```powershell
-planka config     # interactive configuration
-planka create     # interactive create
-planka create --dry-run --verbose
-planka import --dry-run
-planka list
-```
-
-## Interactive create flow (step-by-step)
-
-This documents what happens when you run `node src/index.js create` (or `planka create` if you've linked the CLI).
+This documents what happens when you run `planka create`:
 
 1. Prompt: Title (required)
    - You must enter a non-empty title. This becomes the card name on Planka and the local task `title`.
@@ -112,64 +115,114 @@ Edge cases handled:
 - If list or label lookups return empty, the CLI offers to create a new list/label.
 - If due-date parsing fails, the CLI warns and skips the due date.
 
-## Commands & flags
+## Commands & Flags
 
-Global flags
-- `--verbose` — enable detailed logging for debugging.
+### Global Flags
+- `--verbose` — Enable detailed logging for debugging
 
-Primary commands
-- `node src/index.js config` — Interactive configuration (base URL, username/password, default board). Shows existing values and accepts Enter to keep them.
-- `node src/index.js test` — Quick authentication check; prints board name and basic info.
-- `node src/index.js create` — Interactive task creation (described above).
-  - `--dry-run` — print payload that would be sent to Planka and do not perform writes.
-- `node src/index.js import` — Import missing cards from Planka into local JSON.
-  - `--dry-run` — preview what would be imported without performing writes.
-- `node src/index.js list` — List local tasks and subtasks.
+### Primary Commands
 
-Internal utilities (not commonly needed):
-- `convert-markdown` — convert markdown checkboxes to subtasks (used via `node src/index.js convert-markdown`).
+| Command | Description | Options |
+|---------|-------------|---------|
+| `planka config` | Interactive configuration (URL, username, password, board) | |
+| `planka test` | Quick authentication check; prints board name and info | |
+| `planka create` | Interactive task creation (see flow above) | `--dry-run` |
+| `planka import` | Import missing cards from Planka into local JSON | `--dry-run` |
+| `planka list` | List local tasks and subtasks | `--category <name>`, `--pending` |
 
-Planned/possible improvements (ask me to implement):
-- Non-interactive flags for `create` (e.g., `--title`, `--description`, `--due`, `--list-id`, `--label-ids`) for scripting/CI.
+### Command Options
+- `--dry-run` — Preview what would be created/imported without making changes
+- `--category <name>` — Filter tasks by category (for `list` command)
+- `--pending` — Show only unsynced tasks (for `list` command)
 
 ## Examples
 
-Interactive creation (normal):
+### Basic Usage
 
-```powershell
-node src/index.js create
+```bash
+# First-time setup
+planka config
 
-# Prompts you through: title, description, subtasks, due date, list, label
+# Create a task interactively
+planka create
+
+# Preview what would be created (dry-run)
+planka create --dry-run --verbose
+
+# Import existing cards from Planka
+planka import
+
+# List all local tasks
+planka list
+
+# List only pending (unsynced) tasks
+planka list --pending
+
+# Test your connection
+planka test --verbose
 ```
 
-Dry-run creation (inspect payload):
+### Typical Workflow
 
-```powershell
-node src/index.js create --dry-run --verbose
+```bash
+# 1. Configure once
+planka config
+
+# 2. Create tasks as needed
+planka create
+
+# 3. Sync existing Planka cards
+planka import
+
+# 4. Check what's pending sync
+planka list --pending
 ```
-
-Import preview:
-
-```powershell
-node src/index.js import --dry-run --verbose
-```
-
-List tasks:
-
-```powershell
-node src/index.js list
-```
-
-## Troubleshooting
-
-- Authentication fails: run `node src/index.js test --verbose` to see the exact request/response. Verify `PLANKA_API_URL` and credentials in `~/.planka-cli/config.json`.
-- Date parsing: if your numeric date doesn't parse, try ISO `YYYY-MM-DD` or a natural-language token like `tomorrow`.
-- Non-interactive automation: piping answers into node prompts can be unreliable (PowerShell/tty behavior). Prefer adding non-interactive flags; I can implement them if you want.
 
 ## Contributing
 
-Open for contribution 
+This project uses [automated versioning](CONTRIBUTING.md) with conventional commits. 
+
+### Development Setup
+
+```bash
+git clone https://github.com/apkuki/planka-cli.git
+cd planka-cli
+npm install
+npm link  # Makes 'planka' command available locally
+```
+
+### Commit Message Format
+
+```bash
+feat: new features → minor version bump
+fix: bug fixes → patch version bump  
+docs: documentation → no version bump
+chore: maintenance → no version bump
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
+
+## Troubleshooting
+
+**Authentication Issues:**
+- Run `planka test --verbose` to see detailed request/response
+- Verify `PLANKA_API_URL` and credentials in `~/.planka-cli/config.json`
+- Ensure your Planka instance is accessible and running
+
+**Date Parsing Issues:**
+- Try ISO format: `YYYY-MM-DD` (e.g., `2025-10-30`)
+- Use natural language: `tomorrow`, `next friday`, `in 3 days`
+- For numeric dates, use your locale format (e.g., `30.10.2025` for German)
+
+**Command Not Found:**
+- Run `npm link` in the project directory to make `planka` globally available
+- Or use `node src/index.js` instead of `planka`
+
+**Connection Issues:**
+- Check that your Planka API URL ends with `/api`
+- Verify network connectivity to your Planka instance
+- Check firewall settings if using a local Planka instance
 
 ---
 
-Updated: October 23, 2025
+**Version:** 0.1.0-beta.1 | **Updated:** October 2025
