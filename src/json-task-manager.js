@@ -55,13 +55,11 @@ class JsonTaskManager {
   /**
    * Add a new task
    */
-  async addTask(title, description = '', category = 'backend', priority = 'normal', subtasks = [], labels = []) {
+  async addTask(title, description = '', subtasks = [], labels = []) {
     const task = {
       id: Date.now().toString(),
       title,
       description,
-      category: category.toLowerCase(),
-      priority: priority.toLowerCase(),
       status: 'pending',
       labels: labels || [],
       subtasks: subtasks.map(subtask => ({
@@ -79,7 +77,7 @@ class JsonTaskManager {
     
     this.tasks.push(task);
     await this.saveTasks();
-    logger.info(`✅ Task added: "${title}" (${category})`);
+    logger.info(`✅ Task added: "${title}"`);
     if (subtasks.length > 0) {
       logger.info(`📝 With ${subtasks.length} subtasks`);
     }
@@ -126,22 +124,13 @@ class JsonTaskManager {
   }
 
   /**
-   * Get tasks by category
-   */
-  getTasksByCategory(category) {
-    return this.tasks.filter(task => task.category === category.toLowerCase());
-  }
-
-  /**
    * List all tasks
    */
   listTasks() {
     return this.tasks.map(task => ({
       id: task.id,
       title: task.title,
-      category: task.category,
       status: task.status,
-      priority: task.priority,
       synced: task.synced,
       subtasks: task.subtasks || [],
       createdAt: task.createdAt
@@ -212,26 +201,7 @@ class JsonTaskManager {
     return task;
   }
 
-  /**
-   * Auto-categorize task based on title/description
-   */
-  static categorizeTask(title, description = '') {
-    const text = (title + ' ' + description).toLowerCase();
-    
-    const patterns = {
-      backend: ['api', 'server', 'database', 'auth', 'endpoint', 'jwt', 'sql', 'migration'],
-      frontend: ['ui', 'component', 'react', 'vue', 'angular', 'css', 'html', 'design', 'responsive'],
-      testing: ['test', 'spec', 'cypress', 'jest', 'unit', 'integration', 'e2e', 'mock']
-    };
-    
-    for (const [category, keywords] of Object.entries(patterns)) {
-      if (keywords.some(keyword => text.includes(keyword))) {
-        return category;
-      }
-    }
-    
-    return 'backend'; // default
-  }
+  // Note: category/priority features were removed. Label-based classification is used instead.
 }
 
 export default JsonTaskManager;

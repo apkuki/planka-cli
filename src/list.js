@@ -9,16 +9,15 @@ export default async function listTasksHandler(options = {}) {
   let tasks;
   if (options.pending) {
     tasks = taskManager.getPendingTasks();
-  } else if (options.category) {
-    tasks = taskManager.getTasksByCategory(options.category);
   } else {
     tasks = taskManager.listTasks();
   }
 
   console.log(`\ud83d\udccb Found ${tasks.length} tasks:`);
   tasks.forEach(task => {
-    const status = task.synced ? '\u2705' : '\u23f3';
-    console.log(`${status} [${task.id}] ${task.title} (${task.category})`);
+  const status = task.synced ? '\u2705' : '\u23f3';
+  const labelsText = task.labels && task.labels.length ? ` [labels: ${task.labels.join(', ')}]` : '';
+  console.log(`${status} [${task.id}] ${task.title}${labelsText}`);
 
     if (task.subtasks && task.subtasks.length > 0) {
       task.subtasks.forEach(subtask => {

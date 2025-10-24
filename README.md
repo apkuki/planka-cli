@@ -5,7 +5,7 @@ A command-line interface for creating and syncing tasks between a local JSON fil
 ## Features
 
 - 🎯 **Interactive task creation** with optional description, subtasks, due date, list and label selection
-- 🏷️ **Smart categorization** based on title/description keywords (priority defaults to `normal`)
+- 🏷️ **Label-based classification** (use labels on Planka cards instead of category/priority)
 - 💾 **Local JSON task store** at `tasks.json` with sync metadata (plankaCardId, synced flag)
 - 📥 **Import cards** from Planka into local JSON
 - 🔍 **Dry-run mode** for `create` and `import` to preview without making changes
@@ -124,16 +124,22 @@ Edge cases handled:
 
 | Command | Description | Options |
 |---------|-------------|---------|
-| `planka config` | Interactive configuration (URL, username, password, board) | |
+| `planka config` | Interactive configuration (URL, username, password, board) | `--project`, `--auth`, `--default`, `--dry-run` |
 | `planka test` | Quick authentication check; prints board name and info | |
 | `planka create` | Interactive task creation (see flow above) | `--dry-run` |
 | `planka import` | Import missing cards from Planka into local JSON | `--dry-run` |
-| `planka list` | List local tasks and subtasks | `--category <name>`, `--pending` |
+| `planka list` | List local tasks and subtasks | `--pending` |
 
 ### Command Options
 - `--dry-run` — Preview what would be created/imported without making changes
-- `--category <name>` — Filter tasks by category (for `list` command)
+<!-- category filtering removed: labels are used instead -->
 - `--pending` — Show only unsynced tasks (for `list` command)
+
+### `planka config` options
+- `-p, --project` — Only configure a project-specific board for the current folder (skips the authorization/global default prompts)
+- `-a, --auth` — Only run the authorization setup (Planka URL, username, password)
+- `-d, --default` — Only configure the global default board ID
+- `--dry-run` — Run interactively but do not write any files (shows what would be saved)
 
 ## Examples
 
@@ -148,6 +154,15 @@ planka create
 
 # Preview what would be created (dry-run)
 planka create --dry-run --verbose
+
+# Configure only project-specific board (no auth/global prompts)
+planka config --project
+
+# Configure only authorization (URL/username/password)
+planka config --auth
+
+# Configure global default board ID only
+planka config --default
 
 # Import existing cards from Planka
 planka import
@@ -216,7 +231,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 **Command Not Found:**
 - Run `npm link` in the project directory to make `planka` globally available
-- Or use `node src/index.js` instead of `planka`
+- If you haven't linked globally, see the Installation section above for how to run the CLI without linking.
 
 **Connection Issues:**
 - Check that your Planka API URL ends with `/api`

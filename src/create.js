@@ -74,10 +74,7 @@ export default async function createTaskCLI(opts = {}) {
   const title = await askForInput('Enter task title');
   const description = await askForInput('Enter task description (optional)', '');
 
-  // category heuristic (no interactive prompt - keep auto-categorization)
-  const defaultCategory = JsonTaskManager.categorizeTask(title, description);
-  const category = defaultCategory;
-  const priority = 'normal';
+  // Labels are used instead of category/priority
   const subtasks = await askForSubtasks();
   const dueDate = await askForDueDate();
 
@@ -145,7 +142,7 @@ export default async function createTaskCLI(opts = {}) {
         console.log('ℹ️  DRY RUN MODE - would create task list and items for subtasks:', subtasks);
       }
   // Persist locally (simulate)
-  const localTask = await taskManager.addTask(title, description, category, priority, subtasks, []);
+    const localTask = await taskManager.addTask(title, description, subtasks, []);
       console.log(`✅ (DRY) Saved local task: ${title}`);
       return;
     }
@@ -162,8 +159,8 @@ export default async function createTaskCLI(opts = {}) {
       }
     }
 
-    // Persist locally
-    const localTask = await taskManager.addTask(title, description, category, priority, subtasks, []);
+  // Persist locally
+  const localTask = await taskManager.addTask(title, description, subtasks, []);
     await taskManager.markSynced(localTask.id, createdCardId);
 
     console.log(`✅ Created card on Planka and saved local task: ${title}`);

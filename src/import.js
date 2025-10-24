@@ -79,8 +79,6 @@ export default async function importFromPlanka(options = {}) {
             title: card.name,
             description: card.description || '',
             status: 'todo',
-            priority: 'medium',
-            category: listName.toLowerCase(),
             cardId: card.id,
             tags: [],
             subtasks: [],
@@ -119,7 +117,8 @@ export default async function importFromPlanka(options = {}) {
             }
           }
 
-          taskManager.addTask(task.title, task.description, task.category, task.priority, task.tags);
+          // Use tags as labels when importing
+          taskManager.addTask(task.title, task.description, task.subtasks, task.tags || []);
 
           const tasks = taskManager.listTasks();
           const addedTask = tasks[tasks.length - 1];

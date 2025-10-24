@@ -250,24 +250,7 @@ class PlankaAPI {
   findListByName(boardData, listName) {
     return boardData.included?.lists?.find(l => l.name && l.name.toLowerCase() === String(listName).toLowerCase());
   }
-
-  async setupPriorityLabels(boardId) {
-    try {
-      const boardData = await this.getBoard();
-      const existingLabels = boardData.included?.labels || [];
-      const priorityLabels = { high: { name: 'High', color: 'berry-red' }, normal: { name: 'Normal', color: 'pumpkin-orange' }, low: { name: 'Low', color: 'bright-moss' } };
-      const labelMap = {};
-      for (const [priority, info] of Object.entries(priorityLabels)) {
-        let label = existingLabels.find(l => l.name === info.name);
-        if (!label) label = await this.createLabel(boardId, info);
-        labelMap[priority] = label;
-      }
-      return labelMap;
-    } catch (err) {
-      logger.error('Failed to setup priority labels:', err.message || err);
-      return {};
-    }
-  }
+  
 }
 
 export default PlankaAPI;

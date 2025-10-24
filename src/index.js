@@ -51,7 +51,6 @@ program
 program
   .command('list')
   .description('List all tasks in JSON format')
-  .option('-c, --category <category>', 'Filter by category')
   .option('--pending', 'Show only pending (unsynced) tasks')
   .action(async (options) => {
     await listTasksHandler(options);
