@@ -69,6 +69,38 @@ You can also install directly from the GitHub `ai` branch for early testing with
 npm install github:apkuki/planka-cli#ai
 ```
 
+Developer testing (no publish)
+--------------------------------
+
+If you or contributors just want to test the CLI (or the experimental AI features) locally without publishing to npm, use one of these approaches:
+
+- Quick local link (recommended for development):
+
+```pwsh
+npm install
+npm link
+# now the global `planka` command runs your local code
+planka --help
+
+# when done, unlink
+npm unlink
+```
+
+- Install from the `ai` branch (shareable without publishing):
+
+```pwsh
+npm install github:apkuki/planka-cli#ai
+```
+
+- Pack into a tarball and install elsewhere:
+
+```pwsh
+npm pack   # creates planka-cli-<version>.tgz
+npm install ./planka-cli-<version>.tgz
+```
+
+These approaches avoid publishing and do not require an `NPM_TOKEN` or CI changes.
+
 ## Configuration
 
 The CLI uses a JSON configuration stored in your home directory by default:
