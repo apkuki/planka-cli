@@ -1,4 +1,12 @@
+# Ignore local/CI log artifacts and temp files
+gh_run_*_logs.zip
+*.log
 node_modules/
+dist/
+/.env
+npm-debug.log*
+pnpm-lock.yaml
+yarn.locknode_modules/
 dist/
 .env
 .env.local
