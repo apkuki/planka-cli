@@ -9,8 +9,6 @@ import path from 'path';
 import os from 'os';
 import { configurePlankaCLI } from './config.js';
 import createTaskCLI from './create.js';
-import aiCreateTask from './ai-create.js';
-import interpretTextToAiCreate from './interpret.js';
 import importFromPlanka from './import.js';
 import listTasksHandler from './list.js';
 import { loadConfig } from './config-loader.js';
@@ -171,7 +169,8 @@ program
 
       // Basic validation before calling network-bound aiCreateTask (helps LLMs get quick feedback)
       try {
-        const { validateAiCreateInput } = await import('./ai-create.js');
+        // lazy-load the AI module only when needed so the core CLI stays lightweight
+        const { validateAiCreateInput } = await import('./ai/index.js');
         validateAiCreateInput(data);
       } catch (vErr) {
         if (options.jsonOutput) console.log(JSON.stringify({ code: 2, errors: [vErr.message || String(vErr)] }));
@@ -188,6 +187,7 @@ program
       };
 
       try {
+        const { aiCreateTask } = await import('./ai/index.js');
         const res = await aiCreateTask(data, taskOpts);
         if (options.jsonOutput) {
           console.log(JSON.stringify({ code: 0, result: res }));
@@ -226,7 +226,8 @@ program
         input = (await getStdin()).trim();
       }
 
-      const res = await interpretTextToAiCreate(input, { dryRun: !options.create, create: !!options.create, silent: !!options.silent, jsonOutput: !!options.jsonOutput, noCreate: !!options.noCreate });
+  const { interpretTextToAiCreate } = await import('./ai/index.js');
+  const res = await interpretTextToAiCreate(input, { dryRun: !options.create, create: !!options.create, silent: !!options.silent, jsonOutput: !!options.jsonOutput, noCreate: !!options.noCreate });
       if (options.jsonOutput) console.log(JSON.stringify({ code: 0, result: res }, null, 2));
       else console.log('Inferred payload:', res.payload ? JSON.stringify(res.payload, null, 2) : JSON.stringify(res, null, 2));
       return res;
@@ -262,8 +263,9 @@ program
         process.exit(1);
       }
 
-      const dryRun = true;
-      const res = await interpretTextToAiCreate(input, { dryRun: true, create: false, silent: !!options.silent, jsonOutput: false, noCreate: !!options.noCreate });
+  const dryRun = true;
+  const { interpretTextToAiCreate } = await import('./ai/index.js');
+  const res = await interpretTextToAiCreate(input, { dryRun: true, create: false, silent: !!options.silent, jsonOutput: false, noCreate: !!options.noCreate });
       const payload = res.payload || res;
 
       // Show friendly summary and ask for confirmation unless auto/create specified
