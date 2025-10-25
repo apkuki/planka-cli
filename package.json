@@ -1,5 +1,5 @@
 {
-  "name": "planka-task-sync",
+  "name": "planka-cli",
   "version": "1.2.0",
   "description": "Sync TODO.md tasks with Planka boards",
   "main": "src/index.js",

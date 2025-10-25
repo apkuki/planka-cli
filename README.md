@@ -46,13 +46,11 @@ Install via npm (stable vs. alpha)
 
 This project can be published to npm so users can choose between a stable release and an experimental "AI" release line.
 
-- Package name in this repository: `planka-task-sync` (see `package.json`). If you publish under a different package name (for example `planka-cli`) adapt the commands below.
+- Package name in this repository: `planka-cli` (see `package.json`).
 
 Stable (recommended for most users):
 
 ```pwsh
-npm install planka-task-sync
-# or, if published as 'planka-cli':
 npm install planka-cli
 ```
 
@@ -62,8 +60,6 @@ When publishing experimental builds from the `ai` branch use a pre-release versi
 
 ```pwsh
 # install the alpha dist-tag (published with --tag alpha)
-npm install planka-task-sync@alpha
-# or, if published as 'planka-cli':
 npm install planka-cli@alpha
 ```
 

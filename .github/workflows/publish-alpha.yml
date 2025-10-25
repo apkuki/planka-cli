@@ -1,0 +1,38 @@
+name: Publish alpha (ai branch)
+
+on:
+  push:
+    branches: [ ai ]
+
+jobs:
+  publish-alpha:
+    name: Publish alpha dist-tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Configure npm auth
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "No NPM_TOKEN configured — workflow will fail if run without the token";
+            exit 0;
+          fi
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Install
+        run: npm ci
+
+      - name: Publish (alpha tag)
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "Publishing with dist-tag 'alpha' (no-op if already published)"
+          # Use npm publish with alpha tag. Semantic-release could be used here for full automation
+          npm publish --tag alpha
