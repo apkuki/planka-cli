@@ -41,6 +41,38 @@ npm link
 
 After `npm link`, the CLI will be available as the `planka` command. If you haven't linked globally, use `node src/index.js` instead.
 
+Install via npm (stable vs. alpha)
+--------------------------------
+
+This project can be published to npm so users can choose between a stable release and an experimental "AI" release line.
+
+- Package name in this repository: `planka-task-sync` (see `package.json`). If you publish under a different package name (for example `planka-cli`) adapt the commands below.
+
+Stable (recommended for most users):
+
+```pwsh
+npm install planka-task-sync
+# or, if published as 'planka-cli':
+npm install planka-cli
+```
+
+Alpha / experimental (AI features):
+
+When publishing experimental builds from the `ai` branch use a pre-release version and an npm dist-tag (for example `alpha`). This keeps the stable `latest` tag untouched.
+
+```pwsh
+# install the alpha dist-tag (published with --tag alpha)
+npm install planka-task-sync@alpha
+# or, if published as 'planka-cli':
+npm install planka-cli@alpha
+```
+
+You can also install directly from the GitHub `ai` branch for early testing without publishing to npm:
+
+```pwsh
+npm install github:apkuki/planka-cli#ai
+```
+
 ## Configuration
 
 The CLI uses a JSON configuration stored in your home directory by default:
@@ -179,7 +211,9 @@ planka test --verbose
 
 ## AI / Non-interactive usage
 
-The CLI provides a non-interactive entrypoint `planka ai-create` intended for LLM agents or scripts. It accepts a JSON payload (via `--input <file>` or piped to stdin) describing the card to create. The helper will resolve list names and labels (creating them if missing) and persist a local synced task.
+The CLI provides a non-interactive entrypoint `planka ai-create` intended for LLM agents, automation, or scripts. IMPORTANT: the AI features are experimental and considered "alpha" — use the `ai` branch or the `@alpha` npm dist-tag to opt in. Expect the API and behavior to change while this feature is matured.
+
+It accepts a JSON payload (via `--input <file>` or piped to stdin) describing the card to create. The helper will resolve list names and labels (creating them if missing) and persist a local synced task.
 
 JSON schema (example fields):
 
@@ -212,6 +246,38 @@ cat task.json | planka ai-create --dry-run
 ```
 
 The non-interactive flow uses the same date parsing heuristics as interactive mode and will attempt to match list/label names fuzzily (exact → case-insensitive → substring → startsWith) before creating new ones.
+
+Natural-language examples and the `speak` helper
+-------------------------------------------------
+
+In addition to `ai-create`, the repository includes `planka interpret` and a friendly wrapper `planka speak` that accept plain English instructions and attempt to infer an `ai-create` payload. Use these for rapid human or LLM-driven workflows.
+
+Example free-text inputs that the interpreter understands (variants):
+
+- "Add a task to my Planka board for this open point: We need to test the new API before release. Due next Friday, label: ci, list: To Do"
+- "Create a card: 'Write deployment notes' in 'open llm tasks' with subtasks 'Draft notes', 'Review with team', due in 3 days"
+- "Please create a task to follow up on the design doc; put it in To Do and tag as 'design'"
+- "Add task: Fix README — remove category/priority support — due tomorrow — labels: docs, low-priority"
+
+How to use `speak` interactively (friendly confirmation):
+
+```pwsh
+# show inferred payload and ask for confirmation
+planka speak "Add a task to my Planka board for this open point: We need to test the new API before release. Due next Friday, label: ci, list: To Do"
+
+# auto-confirm and create without prompting
+planka speak --auto "Create card: 'CI: add test coverage' list:'open llm tasks' labels:ci,testing due:in 1 week"
+```
+
+How to use `interpret` for programmatic flows (dry-run by default):
+
+```pwsh
+# infer payload and print JSON (no create)
+planka interpret "Create a card 'Write release notes' in To Do with labels docs,release due next Monday" --json-output
+
+# infer and create immediately
+planka interpret --create "Create a card 'Trial AI feature' in open llm tasks labels:ai,demo due in 2 days"
+```
 
 Machine-friendly usage for LLM agents
 ------------------------------------
