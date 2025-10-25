@@ -1,0 +1,56 @@
+name: Publish alpha (manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'If true, run steps but skip npm publish'
+        required: false
+        default: 'true'
+
+jobs:
+  publish-alpha:
+    name: Publish alpha (manual trigger)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Ensure NPM_TOKEN is set
+        id: check_token
+        run: |
+          if [ -z "${{ secrets.NPM_TOKEN }}" ]; then
+            echo "NPM_TOKEN is not set in repository secrets. Please add an npm automation token as NPM_TOKEN to publish." >&2
+            exit 1
+          fi
+
+      - name: Configure npm auth
+        if: success()
+        run: |
+          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+
+      - name: Install deps
+        run: npm ci
+
+      - name: Print package info
+        run: |
+          cat package.json | jq '{name: .name, version: .version}' || echo "(jq not available)" && node -e "console.log(require('./package.json').name + '@' + require('./package.json').version)"
+
+      - name: Publish (alpha tag)
+        if: ${{ inputs.dry_run != 'true' }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          echo "Publishing ${npm_package_name}@${npm_package_version} with dist-tag 'alpha'"
+          npm publish --tag alpha
+
+      - name: Dry-run info
+        if: ${{ inputs.dry_run == 'true' }}
+        run: |
+          echo "Dry-run mode: steps executed but publish skipped. To publish, run this workflow and set 'dry_run' to 'false'."
