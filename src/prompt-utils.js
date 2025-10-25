@@ -405,5 +405,4 @@ export async function askForAuthorization(existing = {}) {
   return { baseURL, username, password };
 }
 
-// Export parseDateInput for testing and programmatic usage
-export { parseDateInput };
+// (parseDateInput already exported above)

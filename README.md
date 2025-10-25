@@ -213,6 +213,69 @@ cat task.json | planka ai-create --dry-run
 
 The non-interactive flow uses the same date parsing heuristics as interactive mode and will attempt to match list/label names fuzzily (exact → case-insensitive → substring → startsWith) before creating new ones.
 
+Machine-friendly usage for LLM agents
+------------------------------------
+
+To make it easy for an LLM or automation to create tasks without writing a temporary file, `planka ai-create` provides several options:
+
+- `--schema` — prints a minimal JSON schema to stdout (machine-readable) so an agent can request and follow the exact field names and types.
+- `--json '<json>'` — provide the full JSON payload as a single CLI argument (careful with shell quoting).
+- Inline flags (shell-friendly): `--title`, `--description`, `--list`, `--labels`, `--subtasks`, `--due`.
+
+Label and subtask parsing notes:
+- `--labels` accepts a comma-separated list of label names (e.g. `--labels "llm,automation"`).
+- `--subtasks` accepts either comma-separated values or a `||` separated string when commas are expected inside items (e.g. `--subtasks "Draft notes||Review with team"`).
+
+LLM-friendly examples
+---------------------
+
+1) Query schema (recommended first step for an LLM):
+
+```powershell
+planka ai-create --schema
+```
+
+This prints a minimal JSON schema like:
+
+```json
+{
+   "title": "string (required)",
+   "description": "string (optional)",
+   "listName": "string (optional)",
+   "listId": "string (optional)",
+   "labels": ["string"],
+   "subtasks": ["string"],
+   "dueDate": "string (ISO or natural language)"
+}
+```
+
+2) Single-line inline creation (no temp file):
+
+```powershell
+planka ai-create --title "Fix README: remove category/priority" --list "open llm tasks" --labels "llm,automation" --subtasks "Remove category refs||Update examples" --due "in 1 week"
+```
+
+3) Provide JSON inline (careful about shell-quoting):
+
+```powershell
+planka ai-create --json '{"title":"Write release notes","listName":"To Do","labels":["docs"]}'
+```
+
+4) Or pipe JSON via stdin (already supported):
+
+```powershell
+echo '{"title":"CI: add tests","listName":"open llm tasks","labels":["ci"]}' | planka ai-create
+```
+
+Recommendation for LLM integrators
+----------------------------------
+
+1. Call `planka ai-create --schema` to get the exact field names.
+2. Construct a JSON object matching the schema programmatically.
+3. Use `--json '<json>'` or inline flags to call `planka ai-create` without creating a temp file.
+
+The CLI performs basic validation and will return short, machine-friendly error codes (exit code 2 for validation errors) so an agent can retry or reformat its payload.
+
 ### Typical Workflow
 
 ```bash
